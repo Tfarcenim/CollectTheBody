@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
@@ -20,11 +21,14 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.SkullBlock;
 import net.minecraft.world.level.block.entity.SkullBlockEntity;
+import org.apache.commons.lang3.StringUtils;
 import tfar.collectthebody.BodyPartItem;
 
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.UUID;
 
 public class BodyPartItemRenderer<T extends LivingEntity> extends BlockEntityWithoutLevelRenderer {
 
@@ -33,7 +37,7 @@ public class BodyPartItemRenderer<T extends LivingEntity> extends BlockEntityWit
 
     public BodyPartItemRenderer(BlockEntityRenderDispatcher $$0, EntityModelSet entityModelSet, BodyPartItem.Type type) {
         super($$0, entityModelSet);
-        playerModel = new PlayerModel<>(entityModelSet.bakeLayer(ModelLayers.PLAYER),false);
+        playerModel = new PlayerModel<>(entityModelSet.bakeLayer(ModelLayers.PLAYER), false);
         this.type = type;
         playerModel.setAllVisible(false);
         setOnePartVisible();
@@ -43,19 +47,24 @@ public class BodyPartItemRenderer<T extends LivingEntity> extends BlockEntityWit
     @Override
     public void renderByItem(ItemStack stack, ItemTransforms.TransformType $$1, PoseStack poseStack, MultiBufferSource multiBufferSource, int pPackedLight, int pPackedOverlay) {
 
-        RenderType renderType = null;
         CompoundTag tag = stack.getTag();
-        if (tag != null && tag.contains(SkullBlockEntity.TAG_SKULL_OWNER)) {
-            GameProfile gameProfile = NbtUtils.readGameProfile(tag.getCompound(SkullBlockEntity.TAG_SKULL_OWNER));
-            renderType = getRenderType(gameProfile);
-        } else {
-            renderType = getRenderType(null);
+        GameProfile gameprofile = null;
+        if (tag != null) {
+            if (tag.contains("SkullOwner", 10)) {
+                gameprofile = NbtUtils.readGameProfile(tag.getCompound("SkullOwner"));
+            } else if (tag.contains("SkullOwner", 8) && !StringUtils.isBlank(tag.getString("SkullOwner"))) {
+                gameprofile = new GameProfile(null, tag.getString("SkullOwner"));
+                tag.remove("SkullOwner");
+                SkullBlockEntity.updateGameprofile(gameprofile, (p_172560_) -> {
+                    tag.put("SkullOwner", NbtUtils.writeGameProfile(new CompoundTag(), p_172560_));
+                });
+            }
         }
 
-        if (renderType != null) {
-            VertexConsumer vertexConsumer = multiBufferSource.getBuffer(renderType);
-            playerModel.renderToBuffer(poseStack, vertexConsumer, pPackedLight, pPackedOverlay, 1, 1, 1, 1);
-        }
+        RenderType renderType = SkullBlockRenderer.getRenderType(SkullBlock.Types.PLAYER, gameprofile);
+
+        VertexConsumer vertexConsumer = multiBufferSource.getBuffer(renderType);
+        playerModel.renderToBuffer(poseStack, vertexConsumer, pPackedLight, pPackedOverlay, 1, 1, 1, 1);
     }
 
     public static RenderType getRenderType(@Nullable GameProfile $$1) {
@@ -71,7 +80,6 @@ public class BodyPartItemRenderer<T extends LivingEntity> extends BlockEntityWit
             return RenderType.entityCutoutNoCullZOffset($$2);
         }
     }
-
 
 
     public void setOnePartVisible() {
