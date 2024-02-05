@@ -1,6 +1,8 @@
 package tfar.collectthebody;
 
 import net.minecraft.core.Registry;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import org.slf4j.Logger;
@@ -39,4 +41,17 @@ public class CollectTheBody {
         Services.PLATFORM.superRegister(ModMenuTypes.class, Registry.MENU, MenuType.class);
         Services.PLATFORM.superRegister(ModItems.class, Registry.ITEM, Item.class);
     }
+
+    public static void serverLogin(Player player) {
+        ExistingPlayers existingPlayers = ExistingPlayers.getData(player.getServer());
+        if (existingPlayers.isFirstJoin((ServerPlayer) player)) {
+            handleFirstJoin((ServerPlayer) player);
+            existingPlayers.addPlayer((ServerPlayer) player);
+        }
+    }
+
+    public static void handleFirstJoin(ServerPlayer player) {
+
+    }
+
 }

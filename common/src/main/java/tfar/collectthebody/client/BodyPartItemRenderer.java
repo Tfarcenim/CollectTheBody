@@ -1,5 +1,7 @@
 package tfar.collectthebody.client;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -8,13 +10,21 @@ import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.resources.DefaultPlayerSkin;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import tfar.collectthebody.BodyPartItem;
+
+import javax.annotation.Nullable;
+import java.util.Map;
 
 public class BodyPartItemRenderer<T extends LivingEntity> extends BlockEntityWithoutLevelRenderer {
 
@@ -32,9 +42,34 @@ public class BodyPartItemRenderer<T extends LivingEntity> extends BlockEntityWit
 
     @Override
     public void renderByItem(ItemStack stack, ItemTransforms.TransformType $$1, PoseStack poseStack, MultiBufferSource multiBufferSource, int pPackedLight, int pPackedOverlay) {
-            ResourceLocation texture = DefaultPlayerSkin.getDefaultSkin(Minecraft.getInstance().player.getUUID());
-            VertexConsumer vertexConsumer = multiBufferSource.getBuffer(playerModel.renderType(texture));
+
+        RenderType renderType = null;
+        CompoundTag tag = stack.getTag();
+        if (tag != null && tag.contains(SkullBlockEntity.TAG_SKULL_OWNER)) {
+            GameProfile gameProfile = NbtUtils.readGameProfile(tag.getCompound(SkullBlockEntity.TAG_SKULL_OWNER));
+            renderType = getRenderType(gameProfile);
+        } else {
+            renderType = getRenderType(null);
+        }
+
+        if (renderType != null) {
+            VertexConsumer vertexConsumer = multiBufferSource.getBuffer(renderType);
             playerModel.renderToBuffer(poseStack, vertexConsumer, pPackedLight, pPackedOverlay, 1, 1, 1, 1);
+        }
+    }
+
+    public static RenderType getRenderType(@Nullable GameProfile $$1) {
+        ResourceLocation $$2 = DefaultPlayerSkin.getDefaultSkin();
+        if ($$1 != null) {
+            Minecraft $$3 = Minecraft.getInstance();
+            Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> $$4 = $$3.getSkinManager().getInsecureSkinInformation($$1);
+            return $$4.containsKey(MinecraftProfileTexture.Type.SKIN)
+                    ? RenderType.entityTranslucent($$3.getSkinManager().registerTexture($$4.get(MinecraftProfileTexture.Type.SKIN),
+                    MinecraftProfileTexture.Type.SKIN))
+                    : RenderType.entityCutoutNoCull(DefaultPlayerSkin.getDefaultSkin(UUIDUtil.getOrCreatePlayerUUID($$1)));
+        } else {
+            return RenderType.entityCutoutNoCullZOffset($$2);
+        }
     }
 
 
