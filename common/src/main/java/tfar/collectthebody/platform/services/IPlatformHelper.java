@@ -1,6 +1,8 @@
 package tfar.collectthebody.platform.services;
 
 import net.minecraft.core.Registry;
+import net.minecraft.world.item.Item;
+import tfar.collectthebody.BodyPartItem;
 
 public interface IPlatformHelper {
 
@@ -38,5 +40,6 @@ public interface IPlatformHelper {
 
     <T extends Registry<? extends F>,F> void superRegister(Class<?> clazz, T registry, Class<F> filter);
 
+    BodyPartItem createBodyPart(Item.Properties properties, BodyPartItem.Type type);
 
 }

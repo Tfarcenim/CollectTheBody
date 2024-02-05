@@ -2,8 +2,10 @@ package tfar.collectthebody;
 
 import net.minecraft.core.Registry;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tfar.collectthebody.init.ModItems;
 import tfar.collectthebody.init.ModMenuTypes;
 import tfar.collectthebody.platform.Services;
 
@@ -35,5 +37,6 @@ public class CollectTheBody {
       //      LOG.info("Hello to examplemod");
       //  }
         Services.PLATFORM.superRegister(ModMenuTypes.class, Registry.MENU, MenuType.class);
+        Services.PLATFORM.superRegister(ModItems.class, Registry.ITEM, Item.class);
     }
 }

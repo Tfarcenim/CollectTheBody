@@ -3,7 +3,10 @@ package tfar.collectthebody.platform;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import org.apache.commons.lang3.tuple.Pair;
+import tfar.collectthebody.BodyPartItem;
+import tfar.collectthebody.BodyPartItemForge;
 import tfar.collectthebody.CollectTheBody;
 import tfar.collectthebody.CollectTheBodyForge;
 import tfar.collectthebody.platform.services.IPlatformHelper;
@@ -53,4 +56,8 @@ public class ForgePlatformHelper implements IPlatformHelper {
         }
     }
 
+    @Override
+    public BodyPartItem createBodyPart(Item.Properties properties, BodyPartItem.Type type) {
+        return new BodyPartItemForge(properties,type);
+    }
 }

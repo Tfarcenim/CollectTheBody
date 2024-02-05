@@ -12,6 +12,7 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.RegisterEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import tfar.collectthebody.client.CollectTheBodyClient;
+import tfar.collectthebody.data.Datagen;
 import tfar.collectthebody.platform.Services;
 
 import java.util.HashMap;
@@ -33,6 +34,7 @@ public class CollectTheBodyForge {
         IEventBus bus  = FMLJavaModLoadingContext.get().getModEventBus();
         bus.addListener(this::register);
         bus.addListener(this::commonSetup);
+        bus.addListener(Datagen::gather);
         if (FMLEnvironment.dist.isClient()) {
             bus.addListener(this::clientSetup);
         }
