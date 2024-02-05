@@ -9,6 +9,8 @@ import tfar.collectthebody.BodyPartItem;
 import tfar.collectthebody.BodyPartItemForge;
 import tfar.collectthebody.CollectTheBody;
 import tfar.collectthebody.CollectTheBodyForge;
+import tfar.collectthebody.network.C2SModPacket;
+import tfar.collectthebody.network.PacketHandlerForge;
 import tfar.collectthebody.platform.services.IPlatformHelper;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
@@ -59,5 +61,10 @@ public class ForgePlatformHelper implements IPlatformHelper {
     @Override
     public BodyPartItem createBodyPart(Item.Properties properties, BodyPartItem.Type type) {
         return new BodyPartItemForge(properties,type);
+    }
+
+    @Override
+    public void sendToServer(C2SModPacket msg, ResourceLocation channel) {
+        PacketHandlerForge.sendToServer(msg);
     }
 }

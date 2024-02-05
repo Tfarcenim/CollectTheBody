@@ -12,7 +12,9 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.RegisterEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import tfar.collectthebody.client.CollectTheBodyClient;
+import tfar.collectthebody.client.CollectTheBodyClientForge;
 import tfar.collectthebody.data.Datagen;
+import tfar.collectthebody.network.PacketHandlerForge;
 import tfar.collectthebody.platform.Services;
 
 import java.util.HashMap;
@@ -43,10 +45,11 @@ public class CollectTheBodyForge {
 
     private void commonSetup(FMLCommonSetupEvent event) {
         registerLater.clear();
+        PacketHandlerForge.registerMessages();
     }
 
     private void clientSetup(FMLClientSetupEvent event) {
-        CollectTheBodyClient.clientSetup();
+        CollectTheBodyClientForge.clientSetup();
     }
 
     public static Map<Registry<?>, List<Pair<ResourceLocation, Supplier<?>>>> registerLater = new HashMap<>();
