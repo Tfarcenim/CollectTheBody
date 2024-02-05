@@ -7,11 +7,12 @@
     "mixins": [
     ],
     "client": [
-        "MixinTitleScreen"
+      "tfar.collectthebody.mixin.MixinTitleScreen"
     ],
     "server": [
     ],
     "injectors": {
-        "defaultRequire": 1
+      "defaultRequire": 1
     }
-}
+  }
+  
