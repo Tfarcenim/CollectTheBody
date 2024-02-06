@@ -1,5 +1,6 @@
 package tfar.collectthebody;
 
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -10,7 +11,7 @@ import tfar.collectthebody.init.ModMenuTypes;
 public class BodyPartMenu extends AbstractContainerMenu {
 
     public BodyPartMenu(int id,Inventory inventory) {
-        this(id,inventory,new BodyPartContainer(inventory.player));
+        this(id,inventory,new BodyPartContainer());
     }
 
     public BodyPartMenu(int id, Inventory inventory,BodyPartContainer bodyPartContainer) {
@@ -33,6 +34,13 @@ public class BodyPartMenu extends AbstractContainerMenu {
 
         for(int l = 0; l < 9; ++l) {
             this.addSlot(new Slot(inventory, l, 8 + l * 18, 142));
+        }
+    }
+
+    public static class UpdateSlot extends Slot {
+
+        public UpdateSlot(Container $$0, int $$1, int $$2, int $$3) {
+            super($$0, $$1, $$2, $$3);
         }
     }
 

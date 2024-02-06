@@ -13,7 +13,7 @@ import tfar.collectthebody.ducks.PlayerDuck;
 @Mixin(Player.class)
 public class PlayerMixin implements PlayerDuck {
 
-    private BodyPartContainer bodyPartContainer = new BodyPartContainer((Player) (Object) this);
+    private BodyPartContainer bodyPartContainer = new BodyPartContainer();
 
     @Override
     public BodyPartContainer getBodyPartContainer() {

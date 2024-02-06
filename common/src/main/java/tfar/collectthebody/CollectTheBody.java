@@ -7,13 +7,17 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tfar.collectthebody.ducks.PlayerDuck;
 import tfar.collectthebody.init.ModItems;
 import tfar.collectthebody.init.ModMenuTypes;
+import tfar.collectthebody.network.S2CBodyPartsPacket;
 import tfar.collectthebody.platform.Services;
+
+import java.util.List;
 
 // This class is part of the common project meaning it is shared between all supported loaders. Code written here can only
 // import and access the vanilla codebase, libraries used by vanilla, and optionally third party libraries that provide
@@ -54,10 +58,16 @@ public class CollectTheBody {
         }
     }
 
+    public static void playerTick(ServerPlayer player) {
+        S2CBodyPartsPacket.send(player);
+    }
+
     public static void handleFirstJoin(ServerPlayer player) {
         BodyPartContainer bodyPartContainer = ((PlayerDuck)player).getBodyPartContainer();
         CompoundTag nameTag = new CompoundTag();
         nameTag.putString(SkullBlockEntity.TAG_SKULL_OWNER,player.getGameProfile().getName());
+
+        bodyPartContainer.setItem(0,new ItemStack(Items.PLAYER_HEAD));
 
         ItemStack torso = new ItemStack(ModItems.PLAYER_TORSO);
         torso.setTag(nameTag);

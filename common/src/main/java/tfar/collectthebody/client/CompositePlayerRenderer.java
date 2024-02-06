@@ -5,6 +5,9 @@ import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.world.item.ItemStack;
+import tfar.collectthebody.BodyPartContainer;
+import tfar.collectthebody.ducks.PlayerDuck;
 
 public class CompositePlayerRenderer extends PlayerRenderer {
 
@@ -24,7 +27,33 @@ public class CompositePlayerRenderer extends PlayerRenderer {
     }
 
     @Override
-    protected void setModelProperties(AbstractClientPlayer $$0) {
-        super.setModelProperties($$0);
+    public void setModelProperties(AbstractClientPlayer abstractClientPlayer) {
+        super.setModelProperties(abstractClientPlayer);
+        PlayerModel<AbstractClientPlayer> originalModel = getModel();
+        BodyPartContainer bodyPartContainer = ((PlayerDuck)abstractClientPlayer).getBodyPartContainer();
+        if (!itemMatchesPlayerName(abstractClientPlayer,bodyPartContainer.getItem(1))) {
+            originalModel.body.visible = false;
+        }
+
+        if (!itemMatchesPlayerName(abstractClientPlayer,bodyPartContainer.getItem(2))) {
+            originalModel.rightArm.visible = false;
+        }
+
+        if (!itemMatchesPlayerName(abstractClientPlayer,bodyPartContainer.getItem(3))) {
+            originalModel.leftArm.visible = false;
+        }
+
+        if (!itemMatchesPlayerName(abstractClientPlayer,bodyPartContainer.getItem(4))) {
+            originalModel.rightLeg.visible = false;
+        }
+        if (!itemMatchesPlayerName(abstractClientPlayer,bodyPartContainer.getItem(5))) {
+            originalModel.leftLeg.visible = false;
+        }
     }
+
+    protected boolean itemMatchesPlayerName(AbstractClientPlayer abstractClientPlayer,ItemStack stack) {
+        if (stack.isEmpty())return false;
+        return true;
+    }
+
 }

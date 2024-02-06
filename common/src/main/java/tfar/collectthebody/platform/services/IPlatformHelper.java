@@ -2,9 +2,11 @@ package tfar.collectthebody.platform.services;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import tfar.collectthebody.BodyPartItem;
 import tfar.collectthebody.network.C2SModPacket;
+import tfar.collectthebody.network.S2CModPacket;
 
 public interface IPlatformHelper {
 
@@ -44,6 +46,10 @@ public interface IPlatformHelper {
 
     BodyPartItem createBodyPart(Item.Properties properties, BodyPartItem.Type type);
     void sendToServer(C2SModPacket msg, ResourceLocation channel);
+    void sendToClient(S2CModPacket msg, ResourceLocation channel, ServerPlayer player);
+
+    void sendToTracking(S2CModPacket msg,ResourceLocation channel,ServerPlayer player);
+
 
 
 }

@@ -3,9 +3,12 @@ package tfar.collectthebody;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -40,10 +43,17 @@ public class CollectTheBodyForge {
         bus.addListener(this::commonSetup);
         bus.addListener(Datagen::gather);
         MinecraftForge.EVENT_BUS.addListener(this::login);
+        MinecraftForge.EVENT_BUS.addListener(this::playerTick);
         if (FMLEnvironment.dist.isClient()) {
             bus.addListener(this::clientSetup);
         }
         CollectTheBody.init();
+    }
+
+    private void playerTick(TickEvent.PlayerTickEvent event) {
+        if (event.side == LogicalSide.SERVER && event.phase == TickEvent.Phase.START) {
+            CollectTheBody.playerTick((ServerPlayer) event.player);
+        }
     }
 
     private void login(PlayerEvent.PlayerLoggedInEvent event) {

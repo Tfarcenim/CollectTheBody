@@ -5,6 +5,7 @@ accessible method net/minecraft/client/gui/screens/MenuScreens register (Lnet/mi
 accessible class net/minecraft/client/gui/screens/MenuScreens$ScreenConstructor
 
 extendable method net/minecraft/client/renderer/entity/player/PlayerRenderer setModelProperties (Lnet/minecraft/client/player/AbstractClientPlayer;)V
+accessible field net/minecraft/world/SimpleContainer items Lnet/minecraft/core/NonNullList;
 
 # 1.19.2-
 accessible method net/minecraft/world/inventory/MenuType <init> (Lnet/minecraft/world/inventory/MenuType$MenuSupplier;)V

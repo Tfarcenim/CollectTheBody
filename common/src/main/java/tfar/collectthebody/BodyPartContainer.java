@@ -1,9 +1,7 @@
 package tfar.collectthebody;
 
 import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 
 public class BodyPartContainer extends SimpleContainer {
 
@@ -14,11 +12,13 @@ public class BodyPartContainer extends SimpleContainer {
     //right leg
     //left leg
 
-    public BodyPartContainer(Player player) {
+    public BodyPartContainer() {
         super(6);
-        if (!player.level.isClientSide) {
-            setItem(0,new ItemStack(Items.PLAYER_HEAD));
-        }
+    }
+
+    @Override
+    public void setChanged() {
+        super.setChanged();
     }
 
     public boolean canRemoveItem(int slot) {
@@ -31,8 +31,27 @@ public class BodyPartContainer extends SimpleContainer {
     }
 
     @Override
-    public boolean canPlaceItem(int $$0, ItemStack $$1) {
-        return super.canPlaceItem($$0, $$1);
+    public boolean canPlaceItem(int slot, ItemStack stack) {
+        if (stack.getItem() instanceof BodyPartItem bodyPartItem) {
+            switch (bodyPartItem.type) {
+                case TORSO -> {
+                    return slot == 1;
+                }
+                case RIGHT_ARM -> {
+                    return slot ==2;
+                }
+                case LEFT_ARM -> {
+                    return slot ==3;
+                }
+                case RIGHT_LEG -> {
+                    return slot ==4;
+                }
+                case LEFT_LEG -> {
+                    return slot ==5;
+                }
+            }
+        }
+        return false;
     }
 
 

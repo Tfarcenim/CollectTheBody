@@ -7,6 +7,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import tfar.collectthebody.CollectTheBody;
 
@@ -27,14 +28,20 @@ public class PacketHandlerForge {
                 C2SButtonPacket::write,
                 C2SButtonPacket::new,
                 wrapC2S());
+
+        INSTANCE.registerMessage(i++,
+                S2CBodyPartsPacket.class,
+                S2CBodyPartsPacket::write,
+                S2CBodyPartsPacket::new,
+                wrapS2C());
     }
 
-    /*private static <MSG extends S2CModPacket> BiConsumer<MSG, Supplier<NetworkEvent.Context>> wrapS2C() {
+    private static <MSG extends S2CModPacket> BiConsumer<MSG, Supplier<NetworkEvent.Context>> wrapS2C() {
         return ((msg, contextSupplier) -> {
             contextSupplier.get().enqueueWork(msg::handleClient);
             contextSupplier.get().setPacketHandled(true);
         });
-    }*/
+    }
 
     private static <MSG extends C2SModPacket> BiConsumer<MSG, Supplier<NetworkEvent.Context>> wrapC2S() {
         return ((msg, contextSupplier) -> {
@@ -44,11 +51,15 @@ public class PacketHandlerForge {
         });
     }
 
-    public static <MSG> void sendToClient(MSG packet, ServerPlayer player) {
+    public static <MSG extends S2CModPacket> void sendToTracking(MSG packet,ServerPlayer playerToSync) {
+        INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> playerToSync),packet);
+    }
+
+    public static <MSG extends S2CModPacket> void sendToClient(MSG packet, ServerPlayer player) {
         INSTANCE.sendTo(packet, player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
     }
 
-    public static <MSG> void sendToServer(MSG packet) {
+    public static <MSG extends C2SModPacket> void sendToServer(MSG packet) {
         INSTANCE.sendToServer(packet);
     }
 

@@ -3,6 +3,7 @@ package tfar.collectthebody.platform;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import org.apache.commons.lang3.tuple.Pair;
 import tfar.collectthebody.BodyPartItem;
@@ -11,6 +12,7 @@ import tfar.collectthebody.CollectTheBody;
 import tfar.collectthebody.CollectTheBodyForge;
 import tfar.collectthebody.network.C2SModPacket;
 import tfar.collectthebody.network.PacketHandlerForge;
+import tfar.collectthebody.network.S2CModPacket;
 import tfar.collectthebody.platform.services.IPlatformHelper;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
@@ -66,5 +68,15 @@ public class ForgePlatformHelper implements IPlatformHelper {
     @Override
     public void sendToServer(C2SModPacket msg, ResourceLocation channel) {
         PacketHandlerForge.sendToServer(msg);
+    }
+
+    @Override
+    public void sendToClient(S2CModPacket msg, ResourceLocation channel, ServerPlayer player) {
+        PacketHandlerForge.sendToClient(msg,player);
+    }
+
+    @Override
+    public void sendToTracking(S2CModPacket msg, ResourceLocation channel, ServerPlayer player) {
+        PacketHandlerForge.sendToTracking(msg,player);
     }
 }

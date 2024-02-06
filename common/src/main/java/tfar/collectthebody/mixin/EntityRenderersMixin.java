@@ -20,10 +20,15 @@ public class EntityRenderersMixin {
     @Shadow @Final
     private static Map<String, EntityRendererProvider<AbstractClientPlayer>> PLAYER_PROVIDERS;
 
-    @Inject(method = "<clinit>",at = @At("RETURN"))
-    private static void changeProviders(CallbackInfo ci) {
+
+    static {
         PLAYER_PROVIDERS = ImmutableMap.of(
                 "default", $$0 -> new CompositePlayerRenderer($$0, false), "slim", $$0 -> new CompositePlayerRenderer($$0, true)
         );
     }
+
+    /*@Inject(method = "<clinit>",at = @At("RETURN"))
+    private static void changeProviders(CallbackInfo ci) {
+
+    }*/
 }
