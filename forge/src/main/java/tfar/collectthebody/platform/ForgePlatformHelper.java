@@ -79,4 +79,16 @@ public class ForgePlatformHelper implements IPlatformHelper {
     public void sendToTracking(S2CModPacket msg, ResourceLocation channel, ServerPlayer player) {
         PacketHandlerForge.sendToTracking(msg,player);
     }
+
+    private ClientPlatformHelper clientPlatformHelper;
+
+    @Override
+    public ClientPlatformHelper getClientHelper() {
+        return clientPlatformHelper;
+    }
+
+    @Override
+    public void setClientHelper(ClientPlatformHelper helper) {
+        clientPlatformHelper = helper;
+    }
 }

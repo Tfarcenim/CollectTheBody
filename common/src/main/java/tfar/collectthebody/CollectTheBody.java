@@ -91,7 +91,7 @@ public class CollectTheBody {
     }
 
     public enum BodyHeight {
-        NORMAL(0),MISSING_LEGS(-.6f),HEAD_ONLY(-1.3f);
+        NORMAL(0),MISSING_LEGS(-.6f),HEAD_ONLY(-1.375f);
 
         public final float offset;
 

@@ -59,6 +59,7 @@ public class CollectTheBodyForge {
                 //event.setNewEyeHeight(heightOffset * .9f);
                // event.setNewEyeHeight(event.getOldEyeHeight() + heightOffset);
                 event.setNewSize( EntityDimensions.scalable(0.6F,1.8f + heightOffset),false);
+                event.setNewEyeHeight((1.8f + heightOffset) * .9f);
             }
         }
     }

@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -27,6 +28,7 @@ import tfar.collectthebody.BodyPartContainer;
 import tfar.collectthebody.BodyPartItem;
 import tfar.collectthebody.CollectTheBody;
 import tfar.collectthebody.ducks.PlayerDuck;
+import tfar.collectthebody.platform.Services;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -84,12 +86,8 @@ public class CompositePlayerRenderer extends PlayerRenderer {
 
     @Override
     public void render(AbstractClientPlayer pEntity, float pEntityYaw, float pPartialTicks, PoseStack pMatrixStack, MultiBufferSource pBuffer, int pPackedLight) {
+        if (Services.PLATFORM.getClientHelper().fireRenderPlayerPreEvent(pEntity, this, pPartialTicks, pMatrixStack, pBuffer, pPackedLight)) return;
         this.setModelProperties(pEntity);
-
-
-
-      //  if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderPlayerEvent.Pre(pEntity, this, pPartialTicks, pMatrixStack, pBuffer, pPackedLight))) return;
-      //  net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderPlayerEvent.Post(pEntity, this, pPartialTicks, pMatrixStack, pBuffer, pPackedLight));
         pMatrixStack.pushPose();
         BodyPartContainer bodyPartContainer = ((PlayerDuck)pEntity).getBodyPartContainer();
         pMatrixStack.translate(0, CollectTheBody.getPlayerHeightOffset(pEntity),0);
@@ -99,11 +97,22 @@ public class CompositePlayerRenderer extends PlayerRenderer {
 
         super.render(pEntity, pEntityYaw, pPartialTicks, pMatrixStack, pBuffer, pPackedLight);
         pMatrixStack.popPose();
+
+        Services.PLATFORM.getClientHelper().fireRenderPlayerPostEvent(pEntity, this, pPartialTicks, pMatrixStack, pBuffer, pPackedLight);
     }
 
-    public void renderLimbModel(AbstractClientPlayer pEntity, float pEntityYaw, float pPartialTicks, PoseStack pMatrixStack, MultiBufferSource pBuffer, int pPackedLight,ItemStack stack) {
-        //  if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderPlayerEvent.Pre(pEntity, this, pPartialTicks, pMatrixStack, pBuffer, pPackedLight))) return;
-        //  net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderPlayerEvent.Post(pEntity, this, pPartialTicks, pMatrixStack, pBuffer, pPackedLight));
+    @Override
+    protected void renderNameTag(AbstractClientPlayer player, Component $$1, PoseStack poseStack, MultiBufferSource $$3, int $$4) {//fix name rendering
+        poseStack.translate(0, -CollectTheBody.getPlayerHeightOffset(player),0);//translate up to negate the move down
+        super.renderNameTag(player, $$1, poseStack, $$3, $$4);
+    }
+
+    @Override
+    protected boolean shouldShowName(AbstractClientPlayer $$0) {
+        return true;//super.shouldShowName($$0);
+    }
+
+    public void renderLimbModel(AbstractClientPlayer pEntity, float pEntityYaw, float pPartialTicks, PoseStack pMatrixStack, MultiBufferSource pBuffer, int pPackedLight, ItemStack stack) {
 
         if (stack.getItem() instanceof BodyPartItem bodyPartItem) {
             if (!itemMatchesPlayerName(pEntity, stack)) {

@@ -7,6 +7,7 @@ import net.minecraft.world.item.Item;
 import tfar.collectthebody.BodyPartItem;
 import tfar.collectthebody.network.C2SModPacket;
 import tfar.collectthebody.network.S2CModPacket;
+import tfar.collectthebody.platform.ClientPlatformHelper;
 
 public interface IPlatformHelper {
 
@@ -50,6 +51,7 @@ public interface IPlatformHelper {
 
     void sendToTracking(S2CModPacket msg,ResourceLocation channel,ServerPlayer player);
 
-
+    ClientPlatformHelper getClientHelper();
+    void setClientHelper(ClientPlatformHelper helper);
 
 }

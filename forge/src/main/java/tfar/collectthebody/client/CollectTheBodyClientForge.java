@@ -7,6 +7,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import tfar.collectthebody.network.C2SButtonPacket;
+import tfar.collectthebody.platform.ForgeClientHelper;
+import tfar.collectthebody.platform.Services;
 
 import java.util.List;
 
@@ -16,6 +18,7 @@ public class CollectTheBodyClientForge {
     public static void clientSetup() {
         CollectTheBodyClient.clientSetup();
         MinecraftForge.EVENT_BUS.addListener(CollectTheBodyClientForge::addButtonToPlayer);
+        Services.PLATFORM.setClientHelper(new ForgeClientHelper());
     }
 
     private static void addButtonToPlayer(ScreenEvent.Init.Post event) {
