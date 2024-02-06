@@ -67,26 +67,28 @@ public class CollectTheBody {
         CompoundTag nameTag = new CompoundTag();
         nameTag.putString(SkullBlockEntity.TAG_SKULL_OWNER,player.getGameProfile().getName());
 
-        bodyPartContainer.setItem(0,new ItemStack(Items.PLAYER_HEAD));
+        ItemStack skull = new ItemStack(Items.PLAYER_HEAD);
+        skull.setTag(nameTag.copy());
+        bodyPartContainer.setItem(0,skull);
 
         ItemStack torso = new ItemStack(ModItems.PLAYER_TORSO);
-        torso.setTag(nameTag);
+        torso.setTag(nameTag.copy());
         bodyPartContainer.setItem(1,torso);
 
         ItemStack rightArm = new ItemStack(ModItems.PLAYER_RIGHT_ARM);
-        rightArm.setTag(nameTag);
+        rightArm.setTag(nameTag.copy());
         bodyPartContainer.setItem(2,rightArm);
 
         ItemStack leftArm = new ItemStack(ModItems.PLAYER_LEFT_ARM);
-        leftArm.setTag(nameTag);
+        leftArm.setTag(nameTag.copy());
         bodyPartContainer.setItem(3,leftArm);
 
         ItemStack rightLeg = new ItemStack(ModItems.PLAYER_RIGHT_LEG);
-        rightLeg.setTag(nameTag);
+        rightLeg.setTag(nameTag.copy());
         bodyPartContainer.setItem(4,rightLeg);
 
         ItemStack leftLeg = new ItemStack(ModItems.PLAYER_LEFT_LEG);
-        leftLeg.setTag(nameTag);
+        leftLeg.setTag(nameTag.copy());
         bodyPartContainer.setItem(5,leftLeg);
     }
 }

@@ -1,6 +1,4 @@
 {
-  "parent": "builtin/entity",
-  "textures": {
-    "particle": "minecraft:block/soul_sand"
-  }
+  "parent": "minecraft:item/template_skull"
+
 }

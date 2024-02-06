@@ -22,7 +22,7 @@ public class BodyPartMenu extends AbstractContainerMenu {
         int h = 2;
         for (int y = 0; y < h;y++) {
             for (int x = 0; x < w;x++) {
-                addSlot(new Slot(bodyPartContainer,x + h * y,98 + x * 18,18 + y * 18));
+                addSlot(new UpdateSlot(bodyPartContainer,x + w * y,98 + x * 18,18 + y * 18));
             }
         }
 
@@ -39,8 +39,13 @@ public class BodyPartMenu extends AbstractContainerMenu {
 
     public static class UpdateSlot extends Slot {
 
-        public UpdateSlot(Container $$0, int $$1, int $$2, int $$3) {
-            super($$0, $$1, $$2, $$3);
+        public UpdateSlot(Container $$0, int index, int $$2, int $$3) {
+            super($$0, index, $$2, $$3);
+        }
+
+        @Override
+        public boolean mayPlace(ItemStack $$0) {
+            return container.canPlaceItem(this.getContainerSlot(),$$0);
         }
     }
 

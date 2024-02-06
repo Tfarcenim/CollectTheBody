@@ -55,6 +55,8 @@ public class BodyPartItemRenderer<T extends LivingEntity> extends BlockEntityWit
         RenderType renderType = SkullBlockRenderer.getRenderType(SkullBlock.Types.PLAYER, gameprofile);
 
         VertexConsumer vertexConsumer = multiBufferSource.getBuffer(renderType);
+        poseStack.translate(1,-1.25,0);
+
         playerModel.renderToBuffer(poseStack, vertexConsumer, pPackedLight, pPackedOverlay, 1, 1, 1, 1);
     }
 
