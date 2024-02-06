@@ -1,12 +1,16 @@
 package tfar.collectthebody;
 
 import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tfar.collectthebody.ducks.PlayerDuck;
 import tfar.collectthebody.init.ModItems;
 import tfar.collectthebody.init.ModMenuTypes;
 import tfar.collectthebody.platform.Services;
@@ -51,7 +55,28 @@ public class CollectTheBody {
     }
 
     public static void handleFirstJoin(ServerPlayer player) {
+        BodyPartContainer bodyPartContainer = ((PlayerDuck)player).getBodyPartContainer();
+        CompoundTag nameTag = new CompoundTag();
+        nameTag.putString(SkullBlockEntity.TAG_SKULL_OWNER,player.getGameProfile().getName());
 
+        ItemStack torso = new ItemStack(ModItems.PLAYER_TORSO);
+        torso.setTag(nameTag);
+        bodyPartContainer.setItem(1,torso);
+
+        ItemStack rightArm = new ItemStack(ModItems.PLAYER_RIGHT_ARM);
+        rightArm.setTag(nameTag);
+        bodyPartContainer.setItem(2,rightArm);
+
+        ItemStack leftArm = new ItemStack(ModItems.PLAYER_LEFT_ARM);
+        leftArm.setTag(nameTag);
+        bodyPartContainer.setItem(3,leftArm);
+
+        ItemStack rightLeg = new ItemStack(ModItems.PLAYER_RIGHT_LEG);
+        rightLeg.setTag(nameTag);
+        bodyPartContainer.setItem(4,rightLeg);
+
+        ItemStack leftLeg = new ItemStack(ModItems.PLAYER_LEFT_LEG);
+        leftLeg.setTag(nameTag);
+        bodyPartContainer.setItem(5,leftLeg);
     }
-
 }
