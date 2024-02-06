@@ -28,6 +28,8 @@ import tfar.collectthebody.BodyPartItem;
 import tfar.collectthebody.ducks.PlayerDuck;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CompositePlayerRenderer extends PlayerRenderer {
 
@@ -37,106 +39,149 @@ public class CompositePlayerRenderer extends PlayerRenderer {
     protected PlayerModel<AbstractClientPlayer> rightLegModel;
     protected PlayerModel<AbstractClientPlayer> leftLegModel;
 
+    protected final List<PlayerModel<AbstractClientPlayer>> limbModels = new ArrayList<>();
+    protected final PlayerModel<AbstractClientPlayer> originalModel;
+
     public CompositePlayerRenderer(EntityRendererProvider.Context context, boolean slim) {
         super(context, slim);
+        originalModel = model;
         torsoModel = new PlayerModel<>(context.bakeLayer(slim ? ModelLayers.PLAYER_SLIM : ModelLayers.PLAYER), slim);
         rightArmModel = new PlayerModel<>(context.bakeLayer(slim ? ModelLayers.PLAYER_SLIM : ModelLayers.PLAYER), slim);
         leftArmModel = new PlayerModel<>(context.bakeLayer(slim ? ModelLayers.PLAYER_SLIM : ModelLayers.PLAYER), slim);
         rightLegModel = new PlayerModel<>(context.bakeLayer(slim ? ModelLayers.PLAYER_SLIM : ModelLayers.PLAYER), slim);
         leftLegModel = new PlayerModel<>(context.bakeLayer(slim ? ModelLayers.PLAYER_SLIM : ModelLayers.PLAYER), slim);
 
-        torsoModel.setAllVisible(false);
-        torsoModel.body.visible = true;
+        limbModels.addAll(List.of(torsoModel,rightArmModel,leftArmModel,rightLegModel,leftLegModel));
+
+
+
+    }
+    protected void hideAllButLimb(BodyPartItem.Type type) {
+        PlayerModel<AbstractClientPlayer> limbModel = limbModels.get(type.ordinal());
+        limbModel.setAllVisible(false);
+
+
+        switch (type) {
+            case TORSO -> {
+                limbModel.body.visible = true;
+            }
+            case RIGHT_ARM -> {
+                limbModel.rightArm.visible = true;
+            }
+            case LEFT_ARM -> {
+                limbModel.leftArm.visible = true;
+            }
+            case RIGHT_LEG -> {
+                limbModel.rightLeg.visible = true;
+            }
+            case LEFT_LEG -> {
+                limbModel.leftLeg.visible = true;
+            }
+        }
+
     }
 
     @Override
     public void render(AbstractClientPlayer pEntity, float pEntityYaw, float pPartialTicks, PoseStack pMatrixStack, MultiBufferSource pBuffer, int pPackedLight) {
         this.setModelProperties(pEntity);
       //  if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderPlayerEvent.Pre(pEntity, this, pPartialTicks, pMatrixStack, pBuffer, pPackedLight))) return;
-        super.render(pEntity, pEntityYaw, pPartialTicks, pMatrixStack, pBuffer, pPackedLight);
       //  net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderPlayerEvent.Post(pEntity, this, pPartialTicks, pMatrixStack, pBuffer, pPackedLight));
 
         BodyPartContainer bodyPartContainer = ((PlayerDuck)pEntity).getBodyPartContainer();
 
-        ItemStack torsoStack = bodyPartContainer.getItem(1);
+        for (BodyPartItem.Type type : BodyPartItem.Type.VALUES) {
+            renderLimbModel(pEntity, pEntityYaw, pPartialTicks, pMatrixStack, pBuffer, pPackedLight, bodyPartContainer.getPart(type));
+        }
 
-        if (!torsoStack.isEmpty() && !itemMatchesPlayerName(pEntity,torsoStack)) {
+        super.render(pEntity, pEntityYaw, pPartialTicks, pMatrixStack, pBuffer, pPackedLight);
 
-            pMatrixStack.pushPose();
-            this.torsoModel.attackTime = this.getAttackAnim(pEntity, pPartialTicks);
+    }
 
-            boolean shouldSit = pEntity.isPassenger() && (pEntity.getVehicle() != null && pEntity.getVehicle() instanceof LivingEntity);//todo forge patch
-            this.torsoModel.riding = shouldSit;
-            this.torsoModel.young = pEntity.isBaby();
-            float f = Mth.rotLerp(pPartialTicks, pEntity.yBodyRotO, pEntity.yBodyRot);
-            float f1 = Mth.rotLerp(pPartialTicks, pEntity.yHeadRotO, pEntity.yHeadRot);
-            float f2 = f1 - f;
-            if (shouldSit && pEntity.getVehicle() instanceof LivingEntity livingentity) {
-                f = Mth.rotLerp(pPartialTicks, livingentity.yBodyRotO, livingentity.yBodyRot);
-                f2 = f1 - f;
-                float f3 = Mth.wrapDegrees(f2);
-                if (f3 < -85.0F) {
-                    f3 = -85.0F;
+    public void renderLimbModel(AbstractClientPlayer pEntity, float pEntityYaw, float pPartialTicks, PoseStack pMatrixStack, MultiBufferSource pBuffer, int pPackedLight,ItemStack stack) {
+        //  if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderPlayerEvent.Pre(pEntity, this, pPartialTicks, pMatrixStack, pBuffer, pPackedLight))) return;
+        //  net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderPlayerEvent.Post(pEntity, this, pPartialTicks, pMatrixStack, pBuffer, pPackedLight));
+
+        if (stack.getItem() instanceof BodyPartItem bodyPartItem) {
+            if (!itemMatchesPlayerName(pEntity, stack)) {
+                pMatrixStack.pushPose();
+
+                PlayerModel<AbstractClientPlayer> limbModel = limbModels.get(bodyPartItem.type.ordinal());
+
+                limbModel.attackTime = this.getAttackAnim(pEntity, pPartialTicks);
+
+                boolean shouldSit = pEntity.isPassenger() && (pEntity.getVehicle() != null && pEntity.getVehicle() instanceof LivingEntity);//todo forge patch
+                limbModel.riding = shouldSit;
+                limbModel.young = pEntity.isBaby();
+                float f = Mth.rotLerp(pPartialTicks, pEntity.yBodyRotO, pEntity.yBodyRot);
+                float f1 = Mth.rotLerp(pPartialTicks, pEntity.yHeadRotO, pEntity.yHeadRot);
+                float f2 = f1 - f;
+                if (shouldSit && pEntity.getVehicle() instanceof LivingEntity livingentity) {
+                    f = Mth.rotLerp(pPartialTicks, livingentity.yBodyRotO, livingentity.yBodyRot);
+                    f2 = f1 - f;
+                    float f3 = Mth.wrapDegrees(f2);
+                    if (f3 < -85.0F) {
+                        f3 = -85.0F;
+                    }
+
+                    if (f3 >= 85.0F) {
+                        f3 = 85.0F;
+                    }
+
+                    f = f1 - f3;
+                    if (f3 * f3 > 2500.0F) {
+                        f += f3 * 0.2F;
+                    }
+
+                    f2 = f1 - f;
                 }
 
-                if (f3 >= 85.0F) {
-                    f3 = 85.0F;
+                float f6 = Mth.lerp(pPartialTicks, pEntity.xRotO, pEntity.getXRot());
+                if (isEntityUpsideDown(pEntity)) {
+                    f6 *= -1.0F;
+                    f2 *= -1.0F;
                 }
 
-                f = f1 - f3;
-                if (f3 * f3 > 2500.0F) {
-                    f += f3 * 0.2F;
+                if (pEntity.hasPose(Pose.SLEEPING)) {
+                    Direction direction = pEntity.getBedOrientation();
+                    if (direction != null) {
+                        float f4 = pEntity.getEyeHeight(Pose.STANDING) - 0.1F;
+                        pMatrixStack.translate((float) (-direction.getStepX()) * f4, 0.0D, (float) (-direction.getStepZ()) * f4);
+                    }
                 }
 
-                f2 = f1 - f;
+                float f7 = this.getBob(pEntity, pPartialTicks);
+                this.setupRotations(pEntity, pMatrixStack, f7, f, pPartialTicks);
+                pMatrixStack.scale(-1.0F, -1.0F, 1.0F);
+                this.scale(pEntity, pMatrixStack, pPartialTicks);
+                pMatrixStack.translate(0.0D, -1.501F, 0.0D);
+                float f8 = 0.0F;
+                float f5 = 0.0F;
+                if (!shouldSit && pEntity.isAlive()) {
+                    f8 = Mth.lerp(pPartialTicks, pEntity.animationSpeedOld, pEntity.animationSpeed);
+                    f5 = pEntity.animationPosition - pEntity.animationSpeed * (1.0F - pPartialTicks);
+                    if (pEntity.isBaby()) {
+                        f5 *= 3.0F;
+                    }
+
+                    if (f8 > 1.0F) {
+                        f8 = 1.0F;
+                    }
+                }
+
+                limbModel.prepareMobModel(pEntity, f5, f8, pPartialTicks);
+                limbModel.setupAnim(pEntity, f5, f8, f7, f2, f6);
+                Minecraft minecraft = Minecraft.getInstance();
+                boolean flag = this.isBodyVisible(pEntity);
+                boolean flag1 = !flag && !pEntity.isInvisibleTo(minecraft.player);
+                boolean flag2 = minecraft.shouldEntityAppearGlowing(pEntity);
+                RenderType rendertype = this.getPartRenderType(pEntity, flag, flag1, flag2, stack);
+                if (rendertype != null) {
+                    VertexConsumer vertexconsumer = pBuffer.getBuffer(rendertype);
+                    int i = getOverlayCoords(pEntity, this.getWhiteOverlayProgress(pEntity, pPartialTicks));
+                    limbModel.renderToBuffer(pMatrixStack, vertexconsumer, pPackedLight, i, 1.0F, 1.0F, 1.0F, flag1 ? 0.15F : 1.0F);
+                }
+                pMatrixStack.popPose();
             }
-
-            float f6 = Mth.lerp(pPartialTicks, pEntity.xRotO, pEntity.getXRot());
-            if (isEntityUpsideDown(pEntity)) {
-                f6 *= -1.0F;
-                f2 *= -1.0F;
-            }
-
-            if (pEntity.hasPose(Pose.SLEEPING)) {
-                Direction direction = pEntity.getBedOrientation();
-                if (direction != null) {
-                    float f4 = pEntity.getEyeHeight(Pose.STANDING) - 0.1F;
-                    pMatrixStack.translate((float) (-direction.getStepX()) * f4, 0.0D, (float) (-direction.getStepZ()) * f4);
-                }
-            }
-
-            float f7 = this.getBob(pEntity, pPartialTicks);
-            this.setupRotations(pEntity, pMatrixStack, f7, f, pPartialTicks);
-            pMatrixStack.scale(-1.0F, -1.0F, 1.0F);
-            this.scale(pEntity, pMatrixStack, pPartialTicks);
-            pMatrixStack.translate(0.0D, -1.501F, 0.0D);
-            float f8 = 0.0F;
-            float f5 = 0.0F;
-            if (!shouldSit && pEntity.isAlive()) {
-                f8 = Mth.lerp(pPartialTicks, pEntity.animationSpeedOld, pEntity.animationSpeed);
-                f5 = pEntity.animationPosition - pEntity.animationSpeed * (1.0F - pPartialTicks);
-                if (pEntity.isBaby()) {
-                    f5 *= 3.0F;
-                }
-
-                if (f8 > 1.0F) {
-                    f8 = 1.0F;
-                }
-            }
-
-            this.torsoModel.prepareMobModel(pEntity, f5, f8, pPartialTicks);
-            this.torsoModel.setupAnim(pEntity, f5, f8, f7, f2, f6);
-            Minecraft minecraft = Minecraft.getInstance();
-            boolean flag = this.isBodyVisible(pEntity);
-            boolean flag1 = !flag && !pEntity.isInvisibleTo(minecraft.player);
-            boolean flag2 = minecraft.shouldEntityAppearGlowing(pEntity);
-            RenderType rendertype = this.getPartRenderType(pEntity, flag, flag1, flag2, torsoStack);
-            if (rendertype != null) {
-                VertexConsumer vertexconsumer = pBuffer.getBuffer(rendertype);
-                int i = getOverlayCoords(pEntity, this.getWhiteOverlayProgress(pEntity, pPartialTicks));
-                this.torsoModel.renderToBuffer(pMatrixStack, vertexconsumer, pPackedLight, i, 1.0F, 1.0F, 1.0F, flag1 ? 0.15F : 1.0F);
-            }
-            pMatrixStack.popPose();
         }
     }
 
@@ -170,53 +215,61 @@ public class CompositePlayerRenderer extends PlayerRenderer {
         }
 
         return SkullBlockRenderer.getRenderType(SkullBlock.Types.PLAYER, gameprofile);
-
-      /*  ResourceLocation $$4 = this.getPartTextureLocation($$0);
-        if ($$2) {
-            return RenderType.itemEntityTranslucentCull($$4);
-        } else if ($$1) {
-            return this.model.renderType($$4);
-        } else {
-            return $$3 ? RenderType.outline($$4) : null;
-        }*/
-    }
-
-    public ResourceLocation getPartTextureLocation(AbstractClientPlayer $$0) {
-        return $$0.getSkinTextureLocation();
     }
 
     @Override
     public void setModelProperties(AbstractClientPlayer abstractClientPlayer) {
         super.setModelProperties(abstractClientPlayer);
-        PlayerModel<AbstractClientPlayer> originalModel = getModel();
         BodyPartContainer bodyPartContainer = ((PlayerDuck)abstractClientPlayer).getBodyPartContainer();
 
-        ItemStack torso = bodyPartContainer.getItem(1);
+      /*  ItemStack torso = bodyPartContainer.getItem(1);
 
         if (!itemMatchesPlayerName(abstractClientPlayer,torso)) {
             originalModel.body.visible = false;
             if (!torso.isEmpty()) {
+                setActiveModel(torsoModel);
+                super.setModelProperties(abstractClientPlayer);
+                hideAllButLimb(BodyPartItem.Type.TORSO);
+            }
+        }*/
 
+        for (BodyPartItem.Type type : BodyPartItem.Type.VALUES) {
+            ItemStack limbStack = bodyPartContainer.getPart(type);
+            if (!itemMatchesPlayerName(abstractClientPlayer,limbStack)) {
+                hideOriginalLimb(type);
+                if (!limbStack.isEmpty()) {
+                    setActiveModel(limbModels.get(type.ordinal()));
+                    super.setModelProperties(abstractClientPlayer);
+                    hideAllButLimb(type);
+                }
             }
         }
 
-        if (!itemMatchesPlayerName(abstractClientPlayer,bodyPartContainer.getItem(2))) {
-            originalModel.rightArm.visible = false;
+        setActiveModel(this.originalModel);
+    }
+
+    protected void hideOriginalLimb(BodyPartItem.Type type) {
+        switch (type) {
+            case TORSO -> {
+                originalModel.body.visible = false;
+            }
+            case RIGHT_ARM -> {
+                originalModel.rightArm.visible = false;
+            }
+            case LEFT_ARM -> {
+                originalModel.leftArm.visible = false;
+            }
+            case RIGHT_LEG -> {
+                originalModel.rightLeg.visible = false;
+            }
+            case LEFT_LEG -> {
+                originalModel.leftLeg.visible = false;
+            }
         }
+    }
 
-        if (!itemMatchesPlayerName(abstractClientPlayer,bodyPartContainer.getItem(3))) {
-            originalModel.leftArm.visible = false;
-        }
-
-        if (!itemMatchesPlayerName(abstractClientPlayer,bodyPartContainer.getItem(4))) {
-            originalModel.rightLeg.visible = false;
-        }
-        if (!itemMatchesPlayerName(abstractClientPlayer,bodyPartContainer.getItem(5))) {
-            originalModel.leftLeg.visible = false;
-        }
-
-
-
+    protected void setActiveModel(PlayerModel<AbstractClientPlayer> model) {
+        this.model = model;
     }
 
     protected boolean itemMatchesPlayerName(AbstractClientPlayer abstractClientPlayer,ItemStack stack) {

@@ -2,6 +2,7 @@ package tfar.collectthebody;
 
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 public class BodyPartContainer extends SimpleContainer {
 
@@ -16,9 +17,8 @@ public class BodyPartContainer extends SimpleContainer {
         super(6);
     }
 
-    @Override
-    public void setChanged() {
-        super.setChanged();
+    public ItemStack getPart(BodyPartItem.Type type) {
+        return getItem(type.slot());
     }
 
     public boolean canRemoveItem(int slot) {
@@ -32,26 +32,9 @@ public class BodyPartContainer extends SimpleContainer {
 
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
-        if (stack.getItem() instanceof BodyPartItem bodyPartItem) {
-            switch (bodyPartItem.type) {
-                case TORSO -> {
-                    return slot == 1;
-                }
-                case RIGHT_ARM -> {
-                    return slot ==2;
-                }
-                case LEFT_ARM -> {
-                    return slot ==3;
-                }
-                case RIGHT_LEG -> {
-                    return slot ==4;
-                }
-                case LEFT_LEG -> {
-                    return slot ==5;
-                }
-            }
-        }
-        return false;
+        if (slot == 0) return stack.getItem() == Items.PLAYER_HEAD;
+
+        return stack.getItem() instanceof BodyPartItem bodyPartItem && bodyPartItem.type.slot() == slot;
     }
 
 

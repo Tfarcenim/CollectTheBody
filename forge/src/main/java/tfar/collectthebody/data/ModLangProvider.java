@@ -27,6 +27,12 @@ public class ModLangProvider extends LanguageProvider {
         addDefaultItem(() -> ModItems.PLAYER_LEFT_ARM);
         addDefaultItem(() -> ModItems.PLAYER_RIGHT_LEG);
         addDefaultItem(() -> ModItems.PLAYER_LEFT_LEG);
+
+        add("item.collectthebody.player_torso.named", "%s's Torso");
+        add("item.collectthebody.player_right_arm.named", "%s's Right Arm");
+        add("item.collectthebody.player_left_arm.named", "%s's Left Arm");
+        add("item.collectthebody.player_right_leg.named", "%s's Right Leg");
+        add("item.collectthebody.player_left_leg.named", "%s's Left Leg");
     }
 
 
