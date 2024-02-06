@@ -4,8 +4,11 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.LogicalSide;
@@ -16,11 +19,9 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.RegisterEvent;
 import org.apache.commons.lang3.tuple.Pair;
-import tfar.collectthebody.client.CollectTheBodyClient;
 import tfar.collectthebody.client.CollectTheBodyClientForge;
 import tfar.collectthebody.data.Datagen;
 import tfar.collectthebody.network.PacketHandlerForge;
-import tfar.collectthebody.platform.Services;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,10 +45,22 @@ public class CollectTheBodyForge {
         bus.addListener(Datagen::gather);
         MinecraftForge.EVENT_BUS.addListener(this::login);
         MinecraftForge.EVENT_BUS.addListener(this::playerTick);
+        MinecraftForge.EVENT_BUS.addListener(this::eyeHeight);
         if (FMLEnvironment.dist.isClient()) {
             bus.addListener(this::clientSetup);
         }
         CollectTheBody.init();
+    }
+
+    public void eyeHeight(EntityEvent.Size event) {
+        if (event.getEntity() instanceof Player player) {
+            float heightOffset = CollectTheBody.getPlayerHeightOffset(player);
+            if (heightOffset != 0) {
+                //event.setNewEyeHeight(heightOffset * .9f);
+               // event.setNewEyeHeight(event.getOldEyeHeight() + heightOffset);
+                event.setNewSize( EntityDimensions.scalable(0.6F,1.8f + heightOffset),false);
+            }
+        }
     }
 
     private void playerTick(TickEvent.PlayerTickEvent event) {
@@ -79,5 +92,4 @@ public class CollectTheBodyForge {
             }
         }
     }
-
 }

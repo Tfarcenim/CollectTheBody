@@ -25,10 +25,16 @@ public class S2CBodyPartsPacket implements S2CModPacket {
     }
 
     public static void send(ServerPlayer other) {
-        NonNullList<ItemStack> stacks = ((PlayerDuck)other).getBodyPartContainer().items;
-        List<ServerPlayer> allPlayers = other.server.getPlayerList().getPlayers();
-        for (ServerPlayer player : allPlayers) {
-            Services.PLATFORM.sendToClient(new S2CBodyPartsPacket(stacks,other.getUUID()),null,player);
+
+        BodyPartContainer bodyPartContainer = ((PlayerDuck)other).getBodyPartContainer();
+        if (bodyPartContainer.isDirty()) {
+            NonNullList<ItemStack> stacks = ((PlayerDuck) other).getBodyPartContainer().items;
+            List<ServerPlayer> allPlayers = other.server.getPlayerList().getPlayers();
+            for (ServerPlayer player : allPlayers) {
+                Services.PLATFORM.sendToClient(new S2CBodyPartsPacket(stacks, other.getUUID()), null, player);
+            }
+            other.refreshDimensions();
+            bodyPartContainer.setDirty(false);
         }
     }
 
@@ -43,12 +49,15 @@ public class S2CBodyPartsPacket implements S2CModPacket {
 
     @Override
     public void handleClient() {
-        Player player = CollectTheBodyClient.getLocalPlayer();
-        if (player != null) {
-            Player other = player.level.getPlayerByUUID(otherPlayer);
-            BodyPartContainer bodyPartContainer = ((PlayerDuck)other).getBodyPartContainer();
-            for (int i = 0; i < bodyPartContainer.items.size();i++) {
-                bodyPartContainer.setItem(i,stacks.get(i));
+        Player localPlayer = CollectTheBodyClient.getLocalPlayer();
+        if (localPlayer != null) {
+            Player otherPlayer = localPlayer.level.getPlayerByUUID(this.otherPlayer);
+            if (otherPlayer != null) {
+                BodyPartContainer bodyPartContainer = ((PlayerDuck) otherPlayer).getBodyPartContainer();
+                for (int i = 0; i < bodyPartContainer.items.size(); i++) {
+                    bodyPartContainer.setItem(i, stacks.get(i));
+                }
+                otherPlayer.refreshDimensions();
             }
         }
     }

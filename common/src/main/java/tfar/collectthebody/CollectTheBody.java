@@ -17,8 +17,6 @@ import tfar.collectthebody.init.ModMenuTypes;
 import tfar.collectthebody.network.S2CBodyPartsPacket;
 import tfar.collectthebody.platform.Services;
 
-import java.util.List;
-
 // This class is part of the common project meaning it is shared between all supported loaders. Code written here can only
 // import and access the vanilla codebase, libraries used by vanilla, and optionally third party libraries that provide
 // common compatible binaries. This means common code can not directly use loader specific concepts such as Forge events
@@ -90,5 +88,34 @@ public class CollectTheBody {
         ItemStack leftLeg = new ItemStack(ModItems.PLAYER_LEFT_LEG);
         leftLeg.setTag(nameTag.copy());
         bodyPartContainer.setItem(5,leftLeg);
+    }
+
+    public enum BodyHeight {
+        NORMAL(0),MISSING_LEGS(-.6f),HEAD_ONLY(-1.3f);
+
+        public final float offset;
+
+        BodyHeight(float offset) {
+            this.offset = offset;
+        }
+
+        public static BodyHeight get(Player player) {
+            BodyPartContainer bodyPartContainer = ((PlayerDuck)player).getBodyPartContainer();
+            if (bodyPartContainer == null) return NORMAL;
+            if(!bodyPartContainer.getPart(BodyPartItem.Type.RIGHT_LEG).isEmpty() || !bodyPartContainer.getPart(BodyPartItem.Type.LEFT_LEG).isEmpty()) {
+                return NORMAL;
+            } else if (!bodyPartContainer.getPart(BodyPartItem.Type.TORSO).isEmpty()
+                    || !bodyPartContainer.getPart(BodyPartItem.Type.RIGHT_ARM).isEmpty()
+                    ||!bodyPartContainer.getPart(BodyPartItem.Type.LEFT_ARM).isEmpty()) {
+                return MISSING_LEGS;
+            } else {
+                return HEAD_ONLY;
+            }
+        }
+    }
+
+    public static float getPlayerHeightOffset(Player player) {
+        BodyHeight bodyHeight = BodyHeight.get(player);
+        return bodyHeight.offset;
     }
 }

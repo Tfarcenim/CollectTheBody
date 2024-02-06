@@ -25,6 +25,7 @@ import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import org.apache.commons.lang3.StringUtils;
 import tfar.collectthebody.BodyPartContainer;
 import tfar.collectthebody.BodyPartItem;
+import tfar.collectthebody.CollectTheBody;
 import tfar.collectthebody.ducks.PlayerDuck;
 
 import javax.annotation.Nullable;
@@ -84,17 +85,20 @@ public class CompositePlayerRenderer extends PlayerRenderer {
     @Override
     public void render(AbstractClientPlayer pEntity, float pEntityYaw, float pPartialTicks, PoseStack pMatrixStack, MultiBufferSource pBuffer, int pPackedLight) {
         this.setModelProperties(pEntity);
+
+
+
       //  if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderPlayerEvent.Pre(pEntity, this, pPartialTicks, pMatrixStack, pBuffer, pPackedLight))) return;
       //  net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderPlayerEvent.Post(pEntity, this, pPartialTicks, pMatrixStack, pBuffer, pPackedLight));
-
+        pMatrixStack.pushPose();
         BodyPartContainer bodyPartContainer = ((PlayerDuck)pEntity).getBodyPartContainer();
-
+        pMatrixStack.translate(0, CollectTheBody.getPlayerHeightOffset(pEntity),0);
         for (BodyPartItem.Type type : BodyPartItem.Type.VALUES) {
             renderLimbModel(pEntity, pEntityYaw, pPartialTicks, pMatrixStack, pBuffer, pPackedLight, bodyPartContainer.getPart(type));
         }
 
         super.render(pEntity, pEntityYaw, pPartialTicks, pMatrixStack, pBuffer, pPackedLight);
-
+        pMatrixStack.popPose();
     }
 
     public void renderLimbModel(AbstractClientPlayer pEntity, float pEntityYaw, float pPartialTicks, PoseStack pMatrixStack, MultiBufferSource pBuffer, int pPackedLight,ItemStack stack) {

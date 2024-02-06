@@ -13,7 +13,7 @@ import tfar.collectthebody.init.ModMenuTypes;
 public class BodyPartMenu extends AbstractContainerMenu {
 
     public BodyPartMenu(int id,Inventory inventory) {
-        this(id,inventory,new BodyPartContainer());
+        this(id,inventory,new BodyPartContainer(inventory.player));
     }
 
     public BodyPartMenu(int id, Inventory inventory,BodyPartContainer bodyPartContainer) {
