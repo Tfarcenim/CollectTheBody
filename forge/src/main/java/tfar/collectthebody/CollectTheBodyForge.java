@@ -21,6 +21,7 @@ import net.minecraftforge.registries.RegisterEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import tfar.collectthebody.client.CollectTheBodyClientForge;
 import tfar.collectthebody.data.Datagen;
+import tfar.collectthebody.ducks.PlayerDuck;
 import tfar.collectthebody.network.PacketHandlerForge;
 
 import java.util.HashMap;
@@ -46,10 +47,21 @@ public class CollectTheBodyForge {
         MinecraftForge.EVENT_BUS.addListener(this::login);
         MinecraftForge.EVENT_BUS.addListener(this::playerTick);
         MinecraftForge.EVENT_BUS.addListener(this::eyeHeight);
+        MinecraftForge.EVENT_BUS.addListener(this::clonePlayer);
         if (FMLEnvironment.dist.isClient()) {
             bus.addListener(this::clientSetup);
         }
         CollectTheBody.init();
+    }
+
+    private void clonePlayer(PlayerEvent.Clone event) {
+        Player oldPlayer = event.getOriginal();
+        Player newPlayer = event.getEntity();
+        BodyPartContainer oldContainer = ((PlayerDuck)oldPlayer).getBodyPartContainer();
+        BodyPartContainer newContainer = ((PlayerDuck)newPlayer).getBodyPartContainer();
+        for (int i = 0; i < oldContainer.getContainerSize();i++) {
+            newContainer.setItem(i,oldContainer.getItem(i));
+        }
     }
 
     public void eyeHeight(EntityEvent.Size event) {

@@ -3,6 +3,8 @@ package tfar.collectthebody;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
@@ -14,8 +16,12 @@ import org.slf4j.LoggerFactory;
 import tfar.collectthebody.ducks.PlayerDuck;
 import tfar.collectthebody.init.ModItems;
 import tfar.collectthebody.init.ModMenuTypes;
+import tfar.collectthebody.mixin.EntityAccessor;
 import tfar.collectthebody.network.S2CBodyPartsPacket;
 import tfar.collectthebody.platform.Services;
+
+import java.util.Map;
+
 
 // This class is part of the common project meaning it is shared between all supported loaders. Code written here can only
 // import and access the vanilla codebase, libraries used by vanilla, and optionally third party libraries that provide
@@ -100,6 +106,7 @@ public class CollectTheBody {
         }
 
         public static BodyHeight get(Player player) {
+            if (Services.PLATFORM.hasIdentity(player)) return NORMAL;
             BodyPartContainer bodyPartContainer = ((PlayerDuck)player).getBodyPartContainer();
             if (bodyPartContainer == null) return NORMAL;
             if(!bodyPartContainer.getPart(BodyPartItem.Type.RIGHT_LEG).isEmpty() || !bodyPartContainer.getPart(BodyPartItem.Type.LEFT_LEG).isEmpty()) {
@@ -112,6 +119,15 @@ public class CollectTheBody {
                 return HEAD_ONLY;
             }
         }
+    }
+
+    public static EntityDimensions getDimensions(Player player, Pose pose, Map<Pose, EntityDimensions> poses) {
+        if (Services.PLATFORM.hasIdentity(player)) return null;
+            EntityDimensions entityDimensions = ((EntityAccessor)player).getDimensions();
+            if (pose == Pose.STANDING) {
+                return entityDimensions;
+            }
+            return null;
     }
 
     public static float getPlayerHeightOffset(Player player) {

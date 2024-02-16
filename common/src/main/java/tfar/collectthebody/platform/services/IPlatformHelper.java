@@ -3,6 +3,7 @@ package tfar.collectthebody.platform.services;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import tfar.collectthebody.BodyPartItem;
 import tfar.collectthebody.network.C2SModPacket;
@@ -53,5 +54,7 @@ public interface IPlatformHelper {
 
     ClientPlatformHelper getClientHelper();
     void setClientHelper(ClientPlatformHelper helper);
+
+    boolean hasIdentity(Player player);
 
 }

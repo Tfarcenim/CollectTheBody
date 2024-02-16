@@ -109,7 +109,7 @@ public class CompositePlayerRenderer extends PlayerRenderer {
 
     @Override
     protected boolean shouldShowName(AbstractClientPlayer $$0) {
-        return true;//super.shouldShowName($$0);
+        return super.shouldShowName($$0);
     }
 
     public void renderLimbModel(AbstractClientPlayer pEntity, float pEntityYaw, float pPartialTicks, PoseStack pMatrixStack, MultiBufferSource pBuffer, int pPackedLight, ItemStack stack) {

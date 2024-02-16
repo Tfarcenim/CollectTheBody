@@ -10,6 +10,7 @@
   ],
   "client": [
     "EntityRenderersMixin",
+    "InventoryScreenMixin",
     "MixinMinecraft"
   ],
   "server": [

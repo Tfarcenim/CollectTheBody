@@ -4,12 +4,10 @@ import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import org.apache.commons.lang3.tuple.Pair;
-import tfar.collectthebody.BodyPartItem;
-import tfar.collectthebody.BodyPartItemForge;
-import tfar.collectthebody.CollectTheBody;
-import tfar.collectthebody.CollectTheBodyForge;
+import tfar.collectthebody.*;
 import tfar.collectthebody.network.C2SModPacket;
 import tfar.collectthebody.network.PacketHandlerForge;
 import tfar.collectthebody.network.S2CModPacket;
@@ -90,5 +88,10 @@ public class ForgePlatformHelper implements IPlatformHelper {
     @Override
     public void setClientHelper(ClientPlatformHelper helper) {
         clientPlatformHelper = helper;
+    }
+
+    @Override
+    public boolean hasIdentity(Player player) {
+        return isModLoaded("identity") && IdentityHelper.hasAnyIdentity(player);
     }
 }

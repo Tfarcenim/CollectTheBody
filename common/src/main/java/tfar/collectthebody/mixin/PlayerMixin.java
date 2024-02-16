@@ -15,7 +15,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import tfar.collectthebody.BodyPartContainer;
+import tfar.collectthebody.CollectTheBody;
 import tfar.collectthebody.ducks.PlayerDuck;
 
 import java.util.Map;
@@ -23,10 +25,9 @@ import java.util.Map;
 @Mixin(Player.class)
 public abstract class PlayerMixin extends LivingEntity implements PlayerDuck  {
 
-    @Shadow @Final private static Map<Pose, EntityDimensions> POSES;
-
     @Shadow public abstract void remove(RemovalReason pReason);
 
+    @Shadow @Final private static Map<Pose, EntityDimensions> POSES;
     private BodyPartContainer bodyPartContainer = new BodyPartContainer((Player)(Object)this);
 
     protected PlayerMixin(EntityType<? extends LivingEntity> $$0, Level $$1) {
@@ -50,19 +51,9 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerDuck  {
         bodyPartContainer.fromTag(tag.getList(BP_ITEMS, Tag.TAG_COMPOUND));
     }
 
-
-    /**
-     * @author
-     * @reason
-     */
-    @Overwrite
-    public EntityDimensions getDimensions(Pose pose) {
-        EntityDimensions entityDimensions = ((EntityAccessor)this).getDimensions();
-
-        if (pose == Pose.STANDING) {
-            return entityDimensions;
-        }
-
-        return POSES.getOrDefault(pose, entityDimensions);
+    @Inject(method = "getDimensions",at = @At("HEAD"),cancellable = true)
+    private void onGetPoseEvent(Pose $$0, CallbackInfoReturnable<EntityDimensions> cir) {
+        EntityDimensions newDims = CollectTheBody.getDimensions((Player) (Object)this,$$0,POSES);
+        if (newDims != null) cir.setReturnValue(newDims);
     }
 }
